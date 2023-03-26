@@ -1,4 +1,4 @@
 """FreeCAD Worker"""
-from fc_worker.export_obj import export_to_obj
+from fc_worker.model_configurer import model_configurer_command
 
-__all__ = [export_to_obj]
+__all__ = [model_configurer]
