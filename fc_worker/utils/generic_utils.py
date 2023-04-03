@@ -17,18 +17,20 @@ class PropertyType(Enum):
     BOOL = "bool"
     FLOAT = "float"
     LENGTH = "length"
+    PERCENT = "percent"
+    ANGLE = "angle"
 
 
 PROPERTY_TYPE_MAPPING = {
     "App::PropertyString": PropertyType.STRING.value,
     "App::PropertyEnumeration": PropertyType.SELECT.value,
-    "App::PropertyAngle": PropertyType.NUMBER.value,
+    "App::PropertyAngle": PropertyType.ANGLE.value,
     "App::PropertyBool": PropertyType.BOOL.value,
     "App::PropertyDistance": PropertyType.NUMBER.value,
     "App::PropertyFloat": PropertyType.FLOAT.value,
     "App::PropertyInteger": PropertyType.NUMBER.value,
     "App::PropertyLength": PropertyType.LENGTH.value,
-    "App::PropertyPercent": PropertyType.NUMBER.value,
+    "App::PropertyPercent": PropertyType.PERCENT.value,
 }
 
 
@@ -42,12 +44,24 @@ def get_property_data(obj, exclude_prps=EXCLUDE_PROPERTIES):
             logger.warning(f"{prp_id} not implemented yet.")
             continue
         value = obj.getPropertyByName(prp)
-        if hasattr(value, "Value"):
+        unit = ""
+        if isinstance(value, FreeCAD.Units.Quantity):
+            _, unit = str(value).split(" ")
             value = value.Value
-        data[prp] = {
-            "type": PROPERTY_TYPE_MAPPING[prp_id],
-            "value": value,
-        }
+
+        if PROPERTY_TYPE_MAPPING[prp_id] == PropertyType.SELECT.value:
+            data[prp] = {
+                "type": PROPERTY_TYPE_MAPPING[prp_id],
+                "value": value,
+                "unit": unit,
+                "items": obj.getEnumerationsOfProperty(prp)
+            }
+        else:
+            data[prp] = {
+                "type": PROPERTY_TYPE_MAPPING[prp_id],
+                "value": value,
+                "unit": unit,
+            }
     return data
 
 

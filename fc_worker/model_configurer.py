@@ -95,7 +95,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
         if prp_bag:
             initial_attributes = get_property_data(prp_bag)
             if attributes:
-                update_model(initial_attributes, attributes)
+                update_model(prp_bag, initial_attributes, attributes)
 
         importOBJ.export(get_shape_objs(doc), str(obj_file_path))
     finally:
@@ -104,5 +104,17 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
     return attributes if attributes else initial_attributes
 
 
-def update_model(initial_attributes, new_attributes):
-    pass
+def update_model(prp_bag, initial_attributes, new_attributes):
+    logger.info("trigger update MODEL :)")
+
+    for key, items in new_attributes.items():
+        if items["value"] != initial_attributes[key]["value"]:
+            logger.info(f"{key} is changed!!")
+
+            _value = getattr(prp_bag, key)
+            if hasattr(_value, "Value"):
+                _type = type(_value.Value)
+            else:
+                _type = type(_value)
+            setattr(prp_bag, key, _type(items["value"]))
+            FreeCAD.ActiveDocument.recompute()
