@@ -67,11 +67,7 @@ def get_property_data(obj, exclude_prps=EXCLUDE_PROPERTIES):
 
 def get_property_bag_obj(doc: FreeCAD.ActiveDocument):
     property_bag = "PropertyBag"
-    for obj in doc.Objects:
-        if hasattr(obj, "Proxy") and obj.Proxy:
-            if obj.Proxy.__class__.__name__ == property_bag:
-                return obj
-    return None
+    return doc.getObject(property_bag)
 
 
 def get_shape_objs(doc: FreeCAD.ActiveDocument) -> list:
