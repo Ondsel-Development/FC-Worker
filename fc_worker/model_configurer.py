@@ -105,7 +105,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
 
 
 def update_model(prp_bag, initial_attributes, new_attributes):
-    logger.info("trigger update MODEL :)")
+    logger.info("trigger update model")
 
     for key, items in new_attributes.items():
         if items["value"] != initial_attributes[key]["value"]:
