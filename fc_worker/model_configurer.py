@@ -45,7 +45,7 @@ def model_configurer_command(event, context):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
-        output_file = f"{tmp_dir}/{file_name.stem}_generated.OBJ"
+        output_file = f"{tmp_dir}/{_id}_generated.OBJ"
         file_suffix = file_name.suffix.upper()
         if file_suffix == ".OBJ":
             with open(output_file, "wb") as ff:
