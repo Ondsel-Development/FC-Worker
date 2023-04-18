@@ -1,7 +1,14 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.2...develop)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.3...main)
+
+## [v1.3](https://github.com/Ondsel-Development/FC-Worker/tree/v1.3) (2023-04-18)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.2...v1.3)
+
+**Logs:**
+- Used `context.id` as OBJ generated name instead of `filename.stem`.
+- Allowed to patch model which is used in shared-models.
 
 ## [v1.2](https://github.com/Ondsel-Development/FC-Worker/tree/v1.2) (2023-04-04)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/4a5f23ed77d0267c6a950ff6b085cd8c032f8a5e...v1.2)
