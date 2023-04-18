@@ -20,6 +20,7 @@ def model_configurer_command(event, context):
     # Getting signed url to download the file
     _id = event.get("id")
     access_token = event.get("accessToken")
+    is_shared_model = event.get("isSharedModel", None)
     file_name = pathlib.Path(event.get("fileName"))
     headers = {
         "Authorization": f"Bearer {access_token}"
@@ -75,7 +76,7 @@ def model_configurer_command(event, context):
         headers["Content-Type"] = "application/json"
         logger.debug(json.dumps(data))
         r = requests.patch(
-            url=f"{MODEL_ENDPOINT}/{_id}",
+            url=f"{MODEL_ENDPOINT}/{_id}" if is_shared_model is None else f"{MODEL_ENDPOINT}/{_id}?isSharedModel={str(is_shared_model).lower()}",
             headers=headers,
             data=json.dumps(data),
         )
