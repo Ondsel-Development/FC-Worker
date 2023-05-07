@@ -25,7 +25,6 @@ COMMANDS_EXTENSION = {
 
 def export_command(event, command):
 
-    logger.info('PT: 1')
     attributes = event.get("attributes", {})
 
     # Getting signed url to download the file
@@ -33,7 +32,6 @@ def export_command(event, command):
     access_token = event.get("accessToken", None)
     is_shared_model = event.get("isSharedModel", None)
     file_name = pathlib.Path(event.get("fileName"))
-    logger.info('PT: 2')
 
     headers = {}
     if access_token:
@@ -44,7 +42,6 @@ def export_command(event, command):
         url=f"{UPLOAD_ENDPOINT}/{file_name}" if access_token else f"{UPLOAD_ENDPOINT}/{file_name}?modelId={_id}",
         headers=headers
     )
-    logger.info('PT: 3')
 
     if not res.ok:
         raise Exception("Failed to generate signed url")
@@ -53,7 +50,6 @@ def export_command(event, command):
     res = requests.get(
         url=res.json().get("url"),
     )
-    logger.info('PT: 4')
     if not res.ok:
         raise Exception("Failed to download file from signed url")
     file_data = b""
