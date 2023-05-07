@@ -1,0 +1,18 @@
+import pathlib
+
+import FreeCAD
+
+
+def open_doc_in_freecad(input_file_path: str):
+    input_file_path = pathlib.Path(input_file_path)
+    suffix = input_file_path.suffix.upper()
+    if suffix == ".FCSTD":
+        doc = FreeCAD.openDocument(str(input_file_path))
+        FreeCAD.setActiveDocument(doc.Name)
+    elif suffix == ".OBJ":
+        import Mesh
+        Mesh.open(str(input_file_path))
+    else:
+        raise ValueError(f"Given input file format ({input_file_path}) importer not implemented yet.")
+
+    return FreeCAD.activeDocument()

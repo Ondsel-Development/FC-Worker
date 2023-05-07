@@ -11,5 +11,6 @@ logger.info("Imports successful!")
 
 
 from fc_worker.model_configurer import model_configurer_command
+from fc_worker.exporter import export_command
 
-__all__ = [model_configurer]
+__all__ = [model_configurer, export_command]

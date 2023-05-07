@@ -5,31 +5,47 @@ import logging
 
 import requests
 import FreeCAD
-import importOBJ
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
-from .utils.generic_utils import get_property_bag_obj, get_property_data, get_shape_objs, update_model
+from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model
+from .utils.import_utils import open_doc_in_freecad
+from .utils.export_utils import export_model
 
 
 logger = logging.getLogger(__name__)
 
 
-def model_configurer_command(event, context):
+COMMANDS_EXTENSION = {
+    "EXPORT_FCSTD": "FCStd",
+    "EXPORT_STEP": "STEP",
+    "EXPORT_STL": "STL",
+    "EXPORT_OBJ": "OBJ"
+}
+
+
+def export_command(event, command):
+
+    logger.info('PT: 1')
     attributes = event.get("attributes", {})
 
     # Getting signed url to download the file
     _id = event.get("id")
-    access_token = event.get("accessToken")
+    access_token = event.get("accessToken", None)
     is_shared_model = event.get("isSharedModel", None)
     file_name = pathlib.Path(event.get("fileName"))
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
+    logger.info('PT: 2')
 
+    headers = {}
+    if access_token:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
     res = requests.get(
-        url=f"{UPLOAD_ENDPOINT}/{file_name}",
+        url=f"{UPLOAD_ENDPOINT}/{file_name}" if access_token else f"{UPLOAD_ENDPOINT}/{file_name}?modelId={_id}",
         headers=headers
     )
+    logger.info('PT: 3')
+
     if not res.ok:
         raise Exception("Failed to generate signed url")
 
@@ -37,6 +53,7 @@ def model_configurer_command(event, context):
     res = requests.get(
         url=res.json().get("url"),
     )
+    logger.info('PT: 4')
     if not res.ok:
         raise Exception("Failed to download file from signed url")
     file_data = b""
@@ -46,32 +63,32 @@ def model_configurer_command(event, context):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
-        output_file = f"{tmp_dir}/{_id}_generated.OBJ"
-        file_suffix = file_name.suffix.upper()
-        if file_suffix == ".OBJ":
-            with open(output_file, "wb") as ff:
-                ff.write(file_data)
-        elif file_suffix == ".FCSTD":
-            input_file = f"{tmp_dir}/{file_name}"
-            with open(input_file, "wb") as f:
-                f.write(file_data)
-            attributes = model_configure(input_file, attributes, output_file)
-        else:
-            raise Exception("Give input file format not supported yet.")
+        output_file = f"{tmp_dir}/{_id}_export.{COMMANDS_EXTENSION[command]}"
+        input_file = f"{tmp_dir}/{file_name}"
+
+        with open(input_file, "wb") as f:
+            f.write(file_data)
+
+        export_model_cmd(input_file, attributes, output_file)
 
         res = requests.post(
-            url=UPLOAD_ENDPOINT,
+            url=UPLOAD_ENDPOINT if access_token else f"{UPLOAD_ENDPOINT}?modelId={_id}",
             headers=headers,
             files={"file": open(output_file, "rb")}
         )
+
         if not res.ok:
             raise Exception("Failed to upload generated file")
 
-        data = {
-            "isObjGenerationInProgress": False,
-            "isObjGenerated": True,
-            "attributes": attributes,
-        }
+        data = dict()
+        if command == "EXPORT_FCSTD":
+            data["isExportFCStdGenerated"] = True
+        elif command == "EXPORT_STEP":
+            data["isExportSTEPGenerated"] = True
+        elif command == "EXPORT_STL":
+            data["isExportSTLGenerated"] = True
+        else:
+            data["isExportOBJGenerated"] = True
 
         headers["Content-Type"] = "application/json"
         logger.debug(json.dumps(data))
@@ -86,11 +103,9 @@ def model_configurer_command(event, context):
     return {"Status": "OK"}
 
 
-def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str):
-    initial_attributes = {}
+def export_model_cmd(input_file_path: str, attributes: dict, export_file_path: str):
     try:
-        doc = FreeCAD.openDocument(str(freecad_file_path))
-        FreeCAD.setActiveDocument(doc.Name)
+        doc = open_doc_in_freecad(input_file_path)
 
         prp_bag = get_property_bag_obj(doc)
         if prp_bag:
@@ -98,8 +113,6 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             if attributes:
                 update_model(prp_bag, initial_attributes, attributes)
 
-        importOBJ.export(get_shape_objs(doc), str(obj_file_path))
+        export_model(doc, pathlib.Path(export_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
-
-    return attributes if attributes else initial_attributes

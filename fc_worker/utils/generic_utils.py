@@ -90,3 +90,18 @@ def get_shape_objs(doc: FreeCAD.ActiveDocument) -> list:
     for root_obj in doc.RootObjects:
         shape_objs += _get_shape(root_obj)
     return shape_objs
+
+
+def update_model(prp_bag, initial_attributes, new_attributes):
+
+    for key, items in new_attributes.items():
+        if items["value"] != initial_attributes[key]["value"]:
+            logger.info(f"{key} is changed!!")
+
+            _value = getattr(prp_bag, key)
+            if hasattr(_value, "Value"):
+                _type = type(_value.Value)
+            else:
+                _type = type(_value)
+            setattr(prp_bag, key, _type(items["value"]))
+            FreeCAD.ActiveDocument.recompute()
