@@ -6,7 +6,7 @@ import logging
 import requests
 import FreeCAD
 
-from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
+from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT, SHARED_MODEL_ENDPOINT
 from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model
 from .utils.import_utils import open_doc_in_freecad
 from .utils.export_utils import export_model
@@ -30,7 +30,7 @@ def export_command(event, command):
     # Getting signed url to download the file
     _id = event.get("id")
     access_token = event.get("accessToken", None)
-    is_shared_model = event.get("isSharedModel", None)
+    shared_model_id = event.get("sharedModelId", None)
     file_name = pathlib.Path(event.get("fileName"))
 
     headers = {}
@@ -38,6 +38,8 @@ def export_command(event, command):
         headers = {
             "Authorization": f"Bearer {access_token}"
         }
+
+    logger.info("Start fetching signed URL from upload endpoint.")
     res = requests.get(
         url=f"{UPLOAD_ENDPOINT}/{file_name}" if access_token else f"{UPLOAD_ENDPOINT}/{file_name}?modelId={_id}",
         headers=headers
@@ -45,6 +47,7 @@ def export_command(event, command):
 
     if not res.ok:
         raise Exception("Failed to generate signed url")
+    logger.info("Successfully fetched signed URL.")
 
     # download file from signed url
     res = requests.get(
@@ -67,6 +70,7 @@ def export_command(event, command):
 
         export_model_cmd(input_file, attributes, output_file)
 
+        logger.info("Starting pushing generated mesh to upload endpoint")
         res = requests.post(
             url=UPLOAD_ENDPOINT if access_token else f"{UPLOAD_ENDPOINT}?modelId={_id}",
             headers=headers,
@@ -75,26 +79,42 @@ def export_command(event, command):
 
         if not res.ok:
             raise Exception("Failed to upload generated file")
+        logger.info("Successfully pushed generated mesh to upload endpoint")
 
-        data = dict()
+        model_data = dict()
         if command == "EXPORT_FCSTD":
-            data["isExportFCStdGenerated"] = True
+            model_data["isExportFCStdGenerated"] = True
         elif command == "EXPORT_STEP":
-            data["isExportSTEPGenerated"] = True
+            model_data["isExportSTEPGenerated"] = True
         elif command == "EXPORT_STL":
-            data["isExportSTLGenerated"] = True
+            model_data["isExportSTLGenerated"] = True
         else:
-            data["isExportOBJGenerated"] = True
+            model_data["isExportOBJGenerated"] = True
 
         headers["Content-Type"] = "application/json"
-        logger.debug(json.dumps(data))
-        r = requests.patch(
-            url=f"{MODEL_ENDPOINT}/{_id}" if is_shared_model is None else f"{MODEL_ENDPOINT}/{_id}?isSharedModel={str(is_shared_model).lower()}",
-            headers=headers,
-            data=json.dumps(data),
-        )
-        if r.ok:
-            logger.info(f"Data pushed for {_id}")
+
+        logger.debug(json.dumps(model_data))
+
+        logger.info("Starting patching status")
+        if shared_model_id is None:
+            logger.debug(f"Patching to models")
+            r = requests.patch(
+                url=f"{MODEL_ENDPOINT}/{_id}",
+                headers=headers,
+                data=json.dumps(model_data),
+            )
+        else:
+            logger.debug(f"Patching to shared-models")
+            r = requests.patch(
+                url=f"{SHARED_MODEL_ENDPOINT}/{shared_model_id}",
+                headers=headers,
+                data=json.dumps({"model": model_data}),
+            )
+
+        if not r.ok:
+            raise Exception("Failed to push status data")
+
+        logger.info("Successfully patched status data endpoint")
 
     return {"Status": "OK"}
 
