@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.4...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.5...main)
+
+## [v1.5](https://github.com/Ondsel-Development/FC-Worker/tree/v1.5) (2023-08-06)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.4...v1.5)
+
+**Logs:**
+- [#49](https://github.com/Ondsel-Development/Ondsel-Server/issues/49): Support 2D objects in OBJ
 
 ## [v1.4](https://github.com/Ondsel-Development/FC-Worker/tree/v1.4) (2023-05-15)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.3...v1.4)
