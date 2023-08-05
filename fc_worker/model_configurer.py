@@ -5,10 +5,10 @@ import logging
 
 import requests
 import FreeCAD
-import importOBJ
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
 from .utils.generic_utils import get_property_bag_obj, get_property_data, get_shape_objs, update_model
+from .utils import importOBJ
 
 
 logger = logging.getLogger(__name__)

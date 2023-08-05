@@ -16,7 +16,7 @@ def export_model(doc: FreeCAD.ActiveDocument, export_file_path: pathlib.Path):
         import Mesh
         Mesh.export(get_shape_objs(doc), str(export_file_path))
     elif suffix == ".OBJ":
-        import importOBJ
+        from . import importOBJ
         importOBJ.export(get_shape_objs(doc), str(export_file_path))
     else:
         raise ValueError(f"Give export format {export_file_path} not implemented yet.")
