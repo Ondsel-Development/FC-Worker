@@ -70,11 +70,13 @@ def get_property_bag_obj(doc: FreeCAD.ActiveDocument):
     return doc.getObject(property_bag)
 
 
-def get_shape_objs(doc: FreeCAD.ActiveDocument) -> list:
+def get_shape_objs(doc: FreeCAD.ActiveDocument, objects_to_skip=None) -> list:
     """Return all objects which create shape in the document."""
 
     def _get_shape(obj) -> list:
         objs = []
+        if objects_to_skip and obj in objects_to_skip:
+            return objs
         if (
             hasattr(obj, "Shape")
             and not obj.Shape.isNull()
