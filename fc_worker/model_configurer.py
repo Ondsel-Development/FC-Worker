@@ -8,8 +8,8 @@ import FreeCAD
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
 from .utils.generic_utils import get_property_bag_obj, get_property_data, get_shape_objs, update_model
-from .utils import importOBJ
-
+from .utils.path_utils import create_path_shape_objects, get_path_main_object
+from .freecad_libs import importOBJ
 
 logger = logging.getLogger(__name__)
 
@@ -92,13 +92,17 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
 
+        # support Path objects
+        path_objs = get_path_main_object(doc)
+        create_path_shape_objects(path_objs)
+
         prp_bag = get_property_bag_obj(doc)
         if prp_bag:
             initial_attributes = get_property_data(prp_bag)
             if attributes:
                 update_model(prp_bag, initial_attributes, attributes)
 
-        importOBJ.export(get_shape_objs(doc), str(obj_file_path))
+        importOBJ.export(get_shape_objs(doc, objects_to_skip=path_objs), str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 

@@ -74,14 +74,16 @@ def getIndices(obj,shape,offsetv,offsetvn):
         if shape.Edges and not shape.Faces:
             for e in shape.Edges:
                 if isinstance(e.Curve, Part.Line):
-                    vlist_len = len(vlist)
                     for v in e.Vertexes:
                         vlist.append(" "+str(round(v.X,p))+" "+str(round(v.Y,p))+" "+str(round(v.Z,p)))
                     ei = " " + str(len(vlist) - 2 + offsetv)
                     ei += " " + str(len(vlist) - 1 + offsetv)
                     elist.append(ei)
                 else:
-                    discretize_vertexes = e.discretize(round(e.Length/2))
+                    no_of_vertexes = round(e.Length/2)
+                    if no_of_vertexes < 4:
+                        no_of_vertexes = 4
+                    discretize_vertexes = e.discretize(no_of_vertexes)
                     vlist_len = len(vlist)
 
                     for v in discretize_vertexes:
