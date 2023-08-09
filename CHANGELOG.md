@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.5...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.6...main)
+
+## [v1.6](https://github.com/Ondsel-Development/FC-Worker/tree/v1.6) (2023-08-09)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.5...v1.6)
+
+**Logs:**
+- [#49](https://github.com/Ondsel-Development/Ondsel-Server/issues/49): Support Path workbench object
 
 ## [v1.5](https://github.com/Ondsel-Development/FC-Worker/tree/v1.5) (2023-08-06)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.4...v1.5)
