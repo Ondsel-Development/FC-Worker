@@ -1,6 +1,7 @@
 import os
 
 VERSION = 1.6
+
 BACKEND_URL = os.getenv("BACKEND_URL")
 UPLOAD_ENDPOINT = f"{BACKEND_URL}/upload"
 MODEL_ENDPOINT = f"{BACKEND_URL}/models"

@@ -9,12 +9,21 @@ from .config import VERSION, RUNNER_LOGS_ENDPOINT, MODEL_ENDPOINT
 logger = logging.getLogger(__name__)
 
 
+HEALTH_CHECK_CMD = "health_check"
+CONFIGURE_MODEL_CMD = "CONFIGURE_MODEL"
+EXPORT_FCSTD_CMD = "EXPORT_FCSTD"
+EXPORT_STEP_CMD = "EXPORT_STEP"
+EXPORT_STL_CMD = "EXPORT_STL"
+EXPORT_OBJ_CMD = "EXPORT_OBJ"
+EXPORT_CMDS = [EXPORT_FCSTD_CMD, EXPORT_STEP_CMD, EXPORT_STL_CMD, EXPORT_OBJ_CMD]
+
+
 def get_headers(access_token: str, include_content_type: bool = False) -> dict:
     headers = {
-        "Content-Type": "application/json",
+        "Authorization": f"Bearer {access_token}"
     }
     if include_content_type:
-        headers["Authorization"]: f"Bearer {access_token}"
+        headers["Content-Type"] = "application/json"
     return headers
 
 
@@ -54,10 +63,22 @@ def trace_log(func: Callable) -> Callable:
                 )
 
                 if res.ok:
+                    data_to_patch = {}
+                    if command == CONFIGURE_MODEL_CMD:
+                        data_to_patch["latestLogErrorIdForObjGenerationCommand"] = res.json()["_id"]
+                    elif command == EXPORT_FCSTD_CMD:
+                        data_to_patch["latestLogErrorIdForFcstdExportCommand"] = res.json()["_id"]
+                    elif command == EXPORT_STEP_CMD:
+                        data_to_patch["latestLogErrorIdForStepExportCommand"] = res.json()["_id"]
+                    elif command == EXPORT_STL_CMD:
+                        data_to_patch["latestLogErrorIdForStlExportCommand"] = res.json()["_id"]
+                    elif command == EXPORT_OBJ_CMD:
+                        data_to_patch["latestLogErrorIdForObjExportCommand"] = res.json()["_id"]
+
                     re = requests.patch(
                         url=get_model_endpoint(model_id, is_shared_model),
                         headers=get_headers(access_token, True),
-                        data=json.dumps({"latestLogErrorIdForObjGenerationCommand": res.json()["_id"]})
+                        data=json.dumps(data_to_patch)
                     )
                     if re.ok:
                         logger.info("Log successfully traced!")
