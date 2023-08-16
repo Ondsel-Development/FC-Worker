@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.6...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.7...main)
+
+## [v1.7](https://github.com/Ondsel-Development/FC-Worker/tree/v1.7) (2023-08-16)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.6...v1.7)
+
+**Logs:**
+- [#71](https://github.com/Ondsel-Development/Ondsel-Server/issues/71): Traced success and fails lambda logs
 
 ## [v1.6](https://github.com/Ondsel-Development/FC-Worker/tree/v1.6) (2023-08-09)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.5...v1.6)
