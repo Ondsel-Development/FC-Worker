@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.7...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.8...main)
+
+## [v1.8](https://github.com/Ondsel-Development/FC-Worker/tree/v1.8) (2023-09-02)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.7...v1.8)
+
+**Logs:**
+- [#38-Trello](https://trello.com/c/l9rsndSX/38-rebuild-runner-with-latest-freecad-source-code): Use FreeCAD 0.21 as base image.
 
 ## [v1.7](https://github.com/Ondsel-Development/FC-Worker/tree/v1.7) (2023-08-16)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.6...v1.7)
