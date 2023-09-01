@@ -1,4 +1,4 @@
-FROM amrit3701/freecad-cli:0.20-amd64
+FROM amrit3701/freecad-cli:0.21-amd64
 
 WORKDIR /
 
@@ -11,7 +11,7 @@ ENV LC_ALL en_US.UTF-8
 ENV LANGUAGE en_US:en
 
 COPY requirements/main.txt  .
-RUN  pip3.8 install -r main.txt
+RUN  pip3 install -r main.txt --break-system-packages
 
 COPY fc_worker/ /fc_worker/.
 
