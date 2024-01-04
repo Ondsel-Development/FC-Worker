@@ -5,11 +5,11 @@ import logging
 
 import requests
 import FreeCAD
+import Part
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
 from .utils.generic_utils import get_property_bag_obj, get_property_data, get_shape_objs, update_model
 from .utils.path_utils import create_path_shape_objects, get_path_main_object
-from .freecad_libs import importOBJ
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def model_configurer_command(event, context):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
-        output_file = f"{tmp_dir}/{_id}_generated.OBJ"
+        output_file = f"{tmp_dir}/{_id}_generated.BREP"
         file_suffix = file_name.suffix.upper()
         if file_suffix == ".OBJ":
             with open(output_file, "wb") as ff:
@@ -102,7 +102,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             if attributes:
                 update_model(prp_bag, initial_attributes, attributes)
 
-        importOBJ.export(get_shape_objs(doc, objects_to_skip=path_objs), str(obj_file_path))
+        Part.export(get_shape_objs(doc, objects_to_skip=path_objs), str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 
