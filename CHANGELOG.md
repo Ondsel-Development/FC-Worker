@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.8...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.9...main)
+
+## [v1.9](https://github.com/Ondsel-Development/FC-Worker/tree/v1.9) (2024-01-07)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.8...v1.9)
+
+**Logs:**
+- [#175-Trello](https://trello.com/c/i2ShRwva/175-update-viewer): Export BREP file instead of OBJ for viewer.
 
 ## [v1.8](https://github.com/Ondsel-Development/FC-Worker/tree/v1.8) (2023-09-02)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.7...v1.8)
