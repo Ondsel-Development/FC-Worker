@@ -102,7 +102,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             if attributes:
                 update_model(prp_bag, initial_attributes, attributes)
 
-        Part.export(get_shape_objs(doc, objects_to_skip=path_objs), str(obj_file_path))
+        Part.export([Part.show(obj.Shape) for obj in get_shape_objs(doc, objects_to_skip=path_objs)], str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 
