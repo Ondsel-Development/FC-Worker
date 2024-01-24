@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.9...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.10...main)
+
+## [v1.10](https://github.com/Ondsel-Development/FC-Worker/tree/v1.10) (2024-01-24)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.9...v1.10)
+
+**Logs:**
+- [#192-Trello](https://trello.com/c/DIXA3Xbc/192-fc-worker-skipping-assembly-nested-shape-objects): FC worker skipping assembly nested shape objects.
 
 ## [v1.9](https://github.com/Ondsel-Development/FC-Worker/tree/v1.9) (2024-01-07)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.8...v1.9)
