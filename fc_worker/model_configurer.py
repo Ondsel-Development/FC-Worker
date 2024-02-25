@@ -126,7 +126,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             for obj in objs_without_brps:
                 Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
 
-            createDocument(f'{temp_dir}/Document.xml', str(obj_file_path))
+            createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 
