@@ -1,15 +1,18 @@
 import pathlib
-import tempfile
 import json
 import logging
+import xml.etree.ElementTree as ET
+import zipfile
+import tempfile
+import os
 
 import requests
 import FreeCAD
 import Part
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
-from .utils.generic_utils import get_property_bag_obj, get_property_data, get_shape_objs, update_model
-from .utils.path_utils import create_path_shape_objects, get_path_main_object
+from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model, get_visible_objects, is_obj_have_part_file
+from .utils.project_utility import createDocument
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +49,7 @@ def model_configurer_command(event, context):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
-        output_file = f"{tmp_dir}/{_id}_generated.BREP"
+        output_file = f"{tmp_dir}/{_id}_generated.FCSTD"
         file_suffix = file_name.suffix.upper()
         if file_suffix == ".OBJ":
             with open(output_file, "wb") as ff:
@@ -91,18 +94,39 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
     try:
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
 
-        # support Path objects
-        path_objs = get_path_main_object(doc)
-        create_path_shape_objects(path_objs)
+            xml_root_gui = ET.parse(f"{temp_dir}/GuiDocument.xml")
+            xml_root = ET.parse(f"{temp_dir}/Document.xml")
 
-        prp_bag = get_property_bag_obj(doc)
-        if prp_bag:
-            initial_attributes = get_property_data(prp_bag)
-            if attributes:
-                update_model(prp_bag, initial_attributes, attributes)
+            visible_objects_names = get_visible_objects(xml_root_gui)
+            logger.debug(f"Visible objects: {visible_objects_names}")
+            objs_without_brps = []
+            for obj_name in visible_objects_names:
+                obj = doc.getObject(obj_name)
+                if hasattr(obj, "Shape") and is_obj_have_part_file(obj_name, xml_root) is False:
+                    objs_without_brps.append(obj)
 
-        Part.export([Part.show(obj.Shape) for obj in get_shape_objs(doc, objects_to_skip=path_objs)], str(obj_file_path))
+            logger.debug(f"Objects without brep: {[i.Name for i in objs_without_brps]}")
+
+            # support Path objects
+            # path_objs = get_path_main_object(doc)
+            # create_path_shape_objects(path_objs)
+
+            prp_bag = get_property_bag_obj(doc)
+            if prp_bag:
+                initial_attributes = get_property_data(prp_bag)
+                if attributes:
+                    update_model(prp_bag, initial_attributes, attributes)
+
+            brep_folder = os.path.join(temp_dir, "breps")
+            os.mkdir(brep_folder)
+            for obj in objs_without_brps:
+                Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
+
+            createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 

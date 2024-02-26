@@ -1,5 +1,7 @@
 import logging
+import xml.etree.ElementTree as ET
 from enum import Enum
+from typing import List
 
 import FreeCAD
 
@@ -107,3 +109,16 @@ def update_model(prp_bag, initial_attributes, new_attributes):
                 _type = type(_value)
             setattr(prp_bag, key, _type(items["value"]))
             FreeCAD.ActiveDocument.recompute()
+
+
+def get_visible_objects(xml_gui_root: ET.ElementTree) -> List[str]:
+    return [view_provider.get('name') for view_provider in xml_gui_root.iter('ViewProvider') if view_provider.find("Properties/Property[@name='Visibility']/Bool[@value='true']") is not None]
+
+
+def is_obj_have_part_file(obj_name: str, xml_root: ET.ElementTree) -> bool:
+    for obj in xml_root.findall(".//Object[@name='{}']".format(obj_name)):
+        for prop in obj.findall(".//Property[@name='Shape']"):
+            part_file = prop.find("Part")
+            if part_file is not None and 'file' in part_file.attrib:
+                return True
+    return False
