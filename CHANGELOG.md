@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.10...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.11...main)
+
+## [v1.11](https://github.com/Ondsel-Development/FC-Worker/tree/v1.11) (2024-02-26)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.10...v1.11)
+
+**Logs:**
+- [#202-Trello](https://trello.com/c/ZqAm5LvF/202-import-fcstd-file-in-threejs-scene): Updated FC worker to support FCStd file on viewer side.
 
 ## [v1.10](https://github.com/Ondsel-Development/FC-Worker/tree/v1.10) (2024-01-24)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.9...v1.10)
