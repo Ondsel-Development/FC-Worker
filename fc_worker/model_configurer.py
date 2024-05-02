@@ -115,12 +115,16 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             # path_objs = get_path_main_object(doc)
             # create_path_shape_objects(path_objs)
 
-            prp_bag = get_property_bag_obj(doc)
-            if prp_bag:
-                initial_attributes = get_property_data(prp_bag)
+            attribute_obj = get_app_varset_obj(doc) or get_property_bag_obj(doc)
+            if attribute_obj:
+                initial_attributes = get_property_data(attribute_obj)
                 if attributes:
-                    update_model(prp_bag, initial_attributes, attributes)
+                    update_model(attribute_obj, initial_attributes, attributes)
+            doc.save()
 
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
             brep_folder = os.path.join(temp_dir, "breps")
             os.mkdir(brep_folder)
             for obj in objs_without_brps:
