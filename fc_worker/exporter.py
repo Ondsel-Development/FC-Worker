@@ -7,7 +7,7 @@ import requests
 import FreeCAD
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT, SHARED_MODEL_ENDPOINT
-from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model
+from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model, get_app_varset_obj
 from .utils.import_utils import open_doc_in_freecad
 from .utils.export_utils import export_model
 
@@ -123,11 +123,11 @@ def export_model_cmd(input_file_path: str, attributes: dict, export_file_path: s
     try:
         doc = open_doc_in_freecad(input_file_path)
 
-        prp_bag = get_property_bag_obj(doc)
-        if prp_bag:
-            initial_attributes = get_property_data(prp_bag)
+        attribute_obj = get_app_varset_obj(doc) or get_property_bag_obj(doc)
+        if attribute_obj:
+            initial_attributes = get_property_data(attribute_obj)
             if attributes:
-                update_model(prp_bag, initial_attributes, attributes)
+                update_model(attribute_obj, initial_attributes, attributes)
 
         export_model(doc, pathlib.Path(export_file_path))
     finally:

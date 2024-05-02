@@ -11,7 +11,7 @@ import FreeCAD
 import Part
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
-from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model, get_visible_objects, is_obj_have_part_file
+from .utils.generic_utils import get_property_bag_obj, get_app_varset_obj, get_property_data, update_model, get_visible_objects, is_obj_have_part_file
 from .utils.project_utility import createDocument
 
 logger = logging.getLogger(__name__)

@@ -72,6 +72,11 @@ def get_property_bag_obj(doc: FreeCAD.ActiveDocument):
     return doc.getObject(property_bag)
 
 
+def get_app_varset_obj(doc: FreeCAD.ActiveDocument):
+    property_bag = "VarSet"
+    return doc.getObject(property_bag)
+
+
 def get_shape_objs(doc: FreeCAD.ActiveDocument, objects_to_skip=None) -> list:
     """Return all objects which create shape in the document."""
 

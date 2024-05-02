@@ -1,4 +1,4 @@
-FROM amrit3701/freecad-cli:0.21-amd64
+FROM amrit3701/freecad-cli:0.21-amd64-01.05.2024
 
 WORKDIR /
 
