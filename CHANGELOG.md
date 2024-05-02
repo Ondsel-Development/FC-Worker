@@ -1,7 +1,14 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.11...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.12...main)
+
+## [v1.12](https://github.com/Ondsel-Development/FC-Worker/tree/v1.12) (2024-05-02)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.11...v1.12)
+
+**Logs:**
+- [LENS-161](https://ondsel-brad.atlassian.net/browse/LENS-161): Update FC Worker to use VarSets instead of PropertyBag.
+- [LENS-175](https://ondsel-brad.atlassian.net/browse/LENS-175): FC Worker not updating model with updated attributes.
 
 ## [v1.11](https://github.com/Ondsel-Development/FC-Worker/tree/v1.11) (2024-02-26)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.10...v1.11)
