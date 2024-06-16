@@ -7,6 +7,7 @@ import requests
 import FreeCAD
 
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT, SHARED_MODEL_ENDPOINT
+from .assemblies_handler import download_assemblies
 from .utils.generic_utils import get_property_bag_obj, get_property_data, update_model, get_app_varset_obj
 from .utils.import_utils import open_doc_in_freecad
 from .utils.export_utils import export_model
@@ -68,6 +69,7 @@ def export_command(event, command):
         with open(input_file, "wb") as f:
             f.write(file_data)
 
+        download_assemblies(_id, input_file, tmp_dir, headers)
         export_model_cmd(input_file, attributes, output_file)
 
         logger.info("Starting pushing generated mesh to upload endpoint")
