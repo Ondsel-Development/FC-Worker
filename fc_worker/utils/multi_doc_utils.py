@@ -35,7 +35,7 @@ def find_missing_links(doc):
 
     CopyOnChange links are not supported."""
 
-    missing_links = []
+    missing_links = set()
 
     for link in doc.findObjects("App::Link"):
         if link.LinkCopyOnChange != "Disabled":
@@ -43,6 +43,6 @@ def find_missing_links(doc):
 
         linked_path = find_path_link(link)
         if linked_path and not os.path.exists(linked_path):
-            missing_links.append(linked_path)
+            missing_links.add(linked_path)
 
-    return missing_links
+    return list(missing_links)

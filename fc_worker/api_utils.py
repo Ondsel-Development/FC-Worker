@@ -3,6 +3,7 @@ import requests
 import logging
 from typing import Optional, Callable
 
+from .errors import ERROR_CODES
 from .config import VERSION, RUNNER_LOGS_ENDPOINT, MODEL_ENDPOINT
 
 
@@ -112,6 +113,52 @@ def trace_log(func: Callable) -> Callable:
             else:
                 logger.debug(str(res.text))
                 logger.warning("Got error in tracing log!")
+        return result
+
+    return _wrapper
+
+
+def trace_error_log(func: Callable) -> Callable:
+    """Wrapper to trace error in Model"""
+    def _wrapper(event, context):
+        access_token = event.get("accessToken")
+        model_id = event.get("id", None)
+        is_shared_model = event.get("isSharedModel", None)
+        error_data = None
+        result = None
+        raise_exception = None
+        try:
+            result = func(event, context)
+        except ERROR_CODES as ex:
+            logger.warning(f"Defined Exception occurs: {str(ex)}")
+            error_data = ex.as_dict()
+        except Exception as ex:
+            logger.error(f"Undefined Exception occurs: {str(ex)}")
+            raise_exception = ex
+            error_data = {
+                "code": 999,
+                "type": "INTERNAL_SERVER_ERROR",
+                "detail": {"error": ex.args},
+            }
+        if error_data:
+            res = requests.patch(
+                url=f"{MODEL_ENDPOINT}/{model_id}" if is_shared_model is None else f"{MODEL_ENDPOINT}/{model_id}?isSharedModel={str(is_shared_model).lower()}",
+                headers=get_headers(access_token, True),
+                data=json.dumps({
+                    "isObjGenerationInProgress": False,
+                    "isObjGenerated": False,
+                    "errorMsg": error_data
+                }),
+            )
+            if res.ok:
+                logger.info("Error successfully traced!")
+            else:
+                logger.debug(str(res.text))
+                logger.warning("Got error in tracing log!")
+
+        if raise_exception:
+            raise raise_exception
+
         return result
 
     return _wrapper
