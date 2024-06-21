@@ -4,7 +4,7 @@ import logging
 from typing import Optional, Callable
 
 from .errors import ERROR_CODES
-from .config import VERSION, RUNNER_LOGS_ENDPOINT, MODEL_ENDPOINT
+from .config import VERSION, RUNNER_LOGS_ENDPOINT, MODEL_ENDPOINT, USER_ENDPOINT
 
 
 logger = logging.getLogger(__name__)
@@ -163,3 +163,17 @@ def trace_error_log(func: Callable) -> Callable:
 
     return _wrapper
 
+
+def load_user(event):
+    access_token = event.get("accessToken")
+    resp = requests.get(
+        url=f"{USER_ENDPOINT}/?getOnlyAccessTokenUser=true",
+        headers=get_headers(access_token, True)
+    )
+    if resp.ok:
+        users = resp.json()
+        if users.get("total"):
+            logger.debug("Successfully fetch user details")
+            return users["data"][0]
+    else:
+        logger.warning("Failed to fetch user")
