@@ -10,13 +10,17 @@ import requests
 import FreeCAD
 import Part
 
+from .api_utils import trace_error_log, load_user
+from .errors import MissingAssembliesError, UserNotAllowedToRecomputeAssembliesError
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
+from .assemblies_handler import download_assemblies
 from .utils.generic_utils import get_property_bag_obj, get_app_varset_obj, get_property_data, update_model, get_visible_objects, is_obj_have_part_file
 from .utils.project_utility import createDocument
 
 logger = logging.getLogger(__name__)
 
 
+@trace_error_log
 def model_configurer_command(event, context):
     attributes = event.get("attributes", {})
 
@@ -58,7 +62,24 @@ def model_configurer_command(event, context):
             input_file = f"{tmp_dir}/{file_name}"
             with open(input_file, "wb") as f:
                 f.write(file_data)
-            attributes = model_configure(input_file, attributes, output_file)
+
+            linked_files, files_available, files_not_available = download_assemblies(_id, input_file, tmp_dir, headers)
+            logger.debug(f"Linked Files: {str(linked_files)}")
+            logger.debug(f"Files Available: {str(files_available)}")
+            logger.debug(f"Files not available: {str(files_not_available)}")
+            user = load_user(event)
+
+            if linked_files:
+                if not (user and user.get("tier") in ("Peer", "Enterprise")):
+                    raise UserNotAllowedToRecomputeAssembliesError()
+
+            if files_not_available:
+                raise MissingAssembliesError({
+                    "linkedFiles": linked_files,
+                    "filesAvailable": [f.split("/").pop() for f in files_available],
+                    "filesNotAvailable": files_not_available
+                })
+            attributes = model_configure(input_file, attributes, output_file, files_available)
         else:
             raise Exception("Give input file format not supported yet.")
 
@@ -89,7 +110,7 @@ def model_configurer_command(event, context):
     return {"Status": "OK"}
 
 
-def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str):
+def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str, link_files: list):
     initial_attributes = {}
     try:
         doc = FreeCAD.openDocument(str(freecad_file_path))
@@ -129,6 +150,12 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             os.mkdir(brep_folder)
             for obj in objs_without_brps:
                 Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
+
+            for file in link_files:
+                os.symlink(
+                    file,
+                    f"{temp_dir}/{file.rsplit('/')[-1]}"
+                )
 
             createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
     finally:
