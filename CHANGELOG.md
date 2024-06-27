@@ -1,7 +1,15 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.12...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.13...main)
+
+## [v1.13](https://github.com/Ondsel-Development/FC-Worker/tree/v1.13) (2024-06-27)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.12...v1.13)
+
+**Logs:**
+- [LENS-202](https://ondsel-brad.atlassian.net/browse/LENS-202): Implemented Multi docs feature (minimal).
+- [LENS-203](https://ondsel-brad.atlassian.net/browse/LENS-203): Implemented error codes mechanism; added MissingAssembliesError.
+- [LENS-211](https://ondsel-brad.atlassian.net/browse/LENS-211): Only Peer or Enterprise tier user allow to render multi doc.
 
 ## [v1.12](https://github.com/Ondsel-Development/FC-Worker/tree/v1.12) (2024-05-02)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.11...v1.12)
