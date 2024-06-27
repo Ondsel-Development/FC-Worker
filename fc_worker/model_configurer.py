@@ -10,8 +10,8 @@ import requests
 import FreeCAD
 import Part
 
-from .api_utils import trace_error_log
-from .errors import MissingAssembliesError
+from .api_utils import trace_error_log, load_user
+from .errors import MissingAssembliesError, UserNotAllowedToRecomputeAssembliesError
 from .config import UPLOAD_ENDPOINT, MODEL_ENDPOINT
 from .assemblies_handler import download_assemblies
 from .utils.generic_utils import get_property_bag_obj, get_app_varset_obj, get_property_data, update_model, get_visible_objects, is_obj_have_part_file
@@ -67,6 +67,11 @@ def model_configurer_command(event, context):
             logger.debug(f"Linked Files: {str(linked_files)}")
             logger.debug(f"Files Available: {str(files_available)}")
             logger.debug(f"Files not available: {str(files_not_available)}")
+            user = load_user(event)
+
+            if linked_files:
+                if not (user and user.get("tier") in ("Peer", "Enterprise")):
+                    raise UserNotAllowedToRecomputeAssembliesError()
 
             if files_not_available:
                 raise MissingAssembliesError({

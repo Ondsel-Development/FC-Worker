@@ -23,7 +23,7 @@ def lambda_handler(event, context):
             "Status": "OK"
         }
     elif command.upper() == CONFIGURE_MODEL_CMD:
-        return model_configurer_command(event, command)
+        return model_configurer_command(event, context)
     elif command.upper() in EXPORT_CMDS:
         export_command(event, command)
     else:

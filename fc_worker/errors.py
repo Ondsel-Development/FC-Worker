@@ -18,4 +18,9 @@ class MissingAssembliesError(WorkerError):
     type = "MISSING_ASSEMBLIES_ERROR"
 
 
-ERROR_CODES = (MissingAssembliesError, )
+class UserNotAllowedToRecomputeAssembliesError(WorkerError):
+    code = 102
+    type = "USER_NOT_ALLOWED_TO_RECOMPUTE_ASSEMBLIES_ERROR"
+
+
+ERROR_CODES = (MissingAssembliesError, UserNotAllowedToRecomputeAssembliesError, )
