@@ -116,7 +116,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
         with tempfile.TemporaryDirectory() as temp_dir:
-            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+            with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
 
             xml_root_gui = ET.parse(f"{temp_dir}/GuiDocument.xml")
@@ -144,7 +144,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             doc.save()
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+            with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
             brep_folder = os.path.join(temp_dir, "breps")
             os.mkdir(brep_folder)
@@ -152,9 +152,14 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                 Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
 
             for file in link_files:
+                file_path = file.split("/", 3)
+                relative_file_path = pathlib.Path(file_path[-1])
+                new_file_path = f"{temp_dir}/{relative_file_path.parent}"
+                if not os.path.exists(new_file_path):
+                    os.makedirs(new_file_path)
                 os.symlink(
                     file,
-                    f"{temp_dir}/{file.rsplit('/')[-1]}"
+                    f"{temp_dir}/{relative_file_path}"
                 )
 
             createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))

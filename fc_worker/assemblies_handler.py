@@ -1,4 +1,5 @@
 import logging
+import os
 
 import requests
 import FreeCAD
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def download_links_files(doc, model_id, directory_path, headers):
     def get_value(data, key_path, default=None):
-        keys = key_path.split('.')
+        keys = key_path.split(".")
         val = data
         try:
             for key in keys:
@@ -23,12 +24,25 @@ def download_links_files(doc, model_id, directory_path, headers):
 
     def get_file_data(files, file_name):
         for _file in files:
-            if get_value(_file, 'custFileName') == file_name:
+            if get_value(_file, "custFileName") == file_name:
                 return _file
         return None
 
+    def get_directory_data(directories, dir_name):
+        for _dir in directories:
+            if get_value(_dir, "name") == dir_name:
+                return _dir
+        return None
+
     def download_file(file, output_file_path):
-        _file_name = get_value(file, 'currentVersion.uniqueFileName')
+
+        folder_path = output_file_path.split("/")[:-1]
+        if folder_path:
+            nested_dir = output_file_path.rsplit("/", 1)[0]
+            if not os.path.exists(nested_dir):
+                os.makedirs(output_file_path.rsplit("/", 1)[0])
+
+        _file_name = get_value(file, "currentVersion.uniqueFileName")
         res = requests.get(
             url=f"{UPLOAD_ENDPOINT}/{_file_name}",
             headers=headers
@@ -50,31 +64,65 @@ def download_links_files(doc, model_id, directory_path, headers):
         with open(output_file_path, "wb") as f:
             f.write(file_data)
 
-    files_available = []
-    files_not_available = []
-    linked_files = find_missing_links(doc)
-    model_resp = requests.get(url=f"{MODEL_ENDPOINT}/{model_id}", headers=headers)
-    if model_resp.ok:
-        model = model_resp.json()
-        directory_id = get_value(model, 'file.directory._id', None)
-        if directory_id is None:
-            logger.error("File parent directory not found")
-            return linked_files, files_available, linked_files
+    def fetch_or_get_directory(directory_id):
+        if directory_id in directories:
+            return directories[directory_id]
         directory_resp = requests.get(url=f"{DIRECTORY_ENDPOINT}/{directory_id}", headers=headers)
         if directory_resp.ok:
             directory = directory_resp.json()
-            for file_name in linked_files:
-                file = get_file_data(get_value(directory, 'files'), file_name)
+            directories[directory_id] = directory
+            return directory
+        return None
+
+    files_available = []
+    files_not_available = []
+    linked_files = find_missing_links(doc)
+    logger.debug(f"Linked files: {str(linked_files)}")
+    model_resp = requests.get(url=f"{MODEL_ENDPOINT}/{model_id}", headers=headers)
+    directories = dict()
+    if model_resp.ok:
+        model = model_resp.json()
+
+        for file_path in linked_files:
+            file_path_split = file_path.split("/")
+            directory_id = get_value(model, "file.directory._id", None)
+            if directory_id is None:
+                logger.error("File parent directory not found")
+                return linked_files, files_available, linked_files
+
+            is_directory_not_found = False
+            if len(file_path_split) > 1:
+                for dir_name in file_path_split[:-1]:
+                    directory = fetch_or_get_directory(directory_id)
+                    if directory is None:
+                        logger.error(f"Directory (id: {directory_id} not found")
+                        return linked_files, files_available, linked_files
+                    _dir = get_directory_data(get_value(directory, "directories"), dir_name)
+                    if _dir is None:
+                        logger.error("Directory not found in directory")
+                        files_not_available.append(file_path)
+                        is_directory_not_found = True
+                        break
+                    directory_id = get_value(_dir, "_id")
+                else:
+                    directory = fetch_or_get_directory(directory_id)
+
+            else:
+                directory = fetch_or_get_directory(directory_id)
+                if directory is None:
+                    logger.error("File parent directory not found")
+                    return linked_files, files_available, linked_files
+
+            if is_directory_not_found is False and directory:
+                file_name = file_path_split[-1]
+                file = get_file_data(get_value(directory, "files"), file_name)
                 if file is None:
                     logger.error("File not found in directory")
-                    files_not_available.append(file_name)
+                    files_not_available.append(file_path)
                 else:
-                    file_output_path = f"{directory_path}/{file_name}"
+                    file_output_path = f"{directory_path}/{file_path}"
                     download_file(file, file_output_path)
                     files_available.append(file_output_path)
-        else:
-            logger.error(f"Failed to fetch directory: {directory_id}")
-            return linked_files, files_available, linked_files
     else:
         logger.error(f"Failed to fetch model: {model_id}")
         return linked_files, files_available, linked_files
