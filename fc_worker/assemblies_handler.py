@@ -97,7 +97,10 @@ def download_links_files(doc, model_id, directory_path, headers):
                     if directory is None:
                         logger.error(f"Directory (id: {directory_id} not found")
                         return linked_files, files_available, linked_files
-                    _dir = get_directory_data(get_value(directory, "directories"), dir_name)
+                    if dir_name == "..":
+                        _dir = get_value(directory, "parentDirectory")
+                    else:
+                        _dir = get_directory_data(get_value(directory, "directories"), dir_name)
                     if _dir is None:
                         logger.error("Directory not found in directory")
                         files_not_available.append(file_path)
