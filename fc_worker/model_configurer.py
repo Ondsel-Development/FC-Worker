@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 import tempfile
 import os
+import uuid
 
 import requests
 import FreeCAD
@@ -19,6 +20,7 @@ from .utils.project_utility import createDocument
 
 logger = logging.getLogger(__name__)
 
+NUM_OF_PARENT_DIRECTORY_STEPS = 10
 
 @trace_error_log
 def model_configurer_command(event, context):
@@ -59,11 +61,16 @@ def model_configurer_command(event, context):
             with open(output_file, "wb") as ff:
                 ff.write(file_data)
         elif file_suffix == ".FCSTD":
-            input_file = f"{tmp_dir}/{file_name}"
+            # Create nested directories to handle ".." path in linked files
+            relative_nested_dir_path = "/".join([str(uuid.uuid4()) for _ in range(NUM_OF_PARENT_DIRECTORY_STEPS)])
+            nested_dir_path = f"{tmp_dir}/{relative_nested_dir_path}"
+            os.makedirs(nested_dir_path)
+            logger.info(f"Directory prefix: {nested_dir_path}")
+            input_file = f"{nested_dir_path}/{file_name}"
             with open(input_file, "wb") as f:
                 f.write(file_data)
 
-            linked_files, files_available, files_not_available = download_assemblies(_id, input_file, tmp_dir, headers)
+            linked_files, files_available, files_not_available = download_assemblies(_id, input_file, nested_dir_path, headers)
             logger.debug(f"Linked Files: {str(linked_files)}")
             logger.debug(f"Files Available: {str(files_available)}")
             logger.debug(f"Files not available: {str(files_not_available)}")
@@ -113,10 +120,11 @@ def model_configurer_command(event, context):
 def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str, link_files: list):
     initial_attributes = {}
     try:
+        logger.info(f"Link Files: {str(link_files)}")
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
         with tempfile.TemporaryDirectory() as temp_dir:
-            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+            with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
 
             xml_root_gui = ET.parse(f"{temp_dir}/GuiDocument.xml")
@@ -144,7 +152,11 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             doc.save()
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            with zipfile.ZipFile(freecad_file_path, 'r') as zip_ref:
+            # Create nested directories to handle ".." path in linked files
+            relative_nested_dir_path = "/".join([str(uuid.uuid4()) for _ in range(NUM_OF_PARENT_DIRECTORY_STEPS)])
+            temp_dir = f"{temp_dir}/{relative_nested_dir_path}"
+            os.makedirs(temp_dir)
+            with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
             brep_folder = os.path.join(temp_dir, "breps")
             os.mkdir(brep_folder)
@@ -152,9 +164,14 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                 Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
 
             for file in link_files:
+                file_path = file.split("/", 3 + NUM_OF_PARENT_DIRECTORY_STEPS)
+                relative_file_path = pathlib.Path(file_path[-1])
+                new_file_path = f"{temp_dir}/{relative_file_path.parent}"
+                if not os.path.exists(new_file_path):
+                    os.makedirs(new_file_path)
                 os.symlink(
                     file,
-                    f"{temp_dir}/{file.rsplit('/')[-1]}"
+                    f"{temp_dir}/{relative_file_path}"
                 )
 
             createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
