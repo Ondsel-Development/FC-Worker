@@ -1,7 +1,14 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.13...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.14...main)
+
+## [v1.14](https://github.com/Ondsel-Development/FC-Worker/tree/v1.14) (2024-07-03)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.13...v1.14)
+
+**Logs:**
+- [LENS-205](https://ondsel-brad.atlassian.net/browse/LENS-205): Implement sub directories, parent directories references
+(in same workspace) in multi-doc features
 
 ## [v1.13](https://github.com/Ondsel-Development/FC-Worker/tree/v1.13) (2024-06-27)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.12...v1.13)
