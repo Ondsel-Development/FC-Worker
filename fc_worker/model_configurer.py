@@ -118,6 +118,7 @@ def model_configurer_command(event, context):
 
 
 def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str, link_files: list):
+    exclude_objs = ["App::Plane", "App::Origin"]
     initial_attributes = {}
     try:
         logger.info(f"Link Files: {str(link_files)}")
@@ -135,7 +136,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             objs_without_brps = []
             for obj_name in visible_objects_names:
                 obj = doc.getObject(obj_name)
-                if hasattr(obj, "Shape") and is_obj_have_part_file(obj_name, xml_root) is False:
+                if hasattr(obj, "Shape") and set(obj.getAllDerivedFrom()).isdisjoint(set(exclude_objs)) and is_obj_have_part_file(obj_name, xml_root) is False:
                     objs_without_brps.append(obj)
 
             logger.debug(f"Objects without brep: {[i.Name for i in objs_without_brps]}")
