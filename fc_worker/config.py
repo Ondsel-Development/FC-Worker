@@ -1,6 +1,6 @@
 import os
 
-VERSION = 1.14
+VERSION = 1.15
 
 BACKEND_URL = os.getenv("BACKEND_URL")
 UPLOAD_ENDPOINT = f"{BACKEND_URL}/upload"

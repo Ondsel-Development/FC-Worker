@@ -1,7 +1,14 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.14...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.15...main)
+
+## [v1.15](https://github.com/Ondsel-Development/FC-Worker/tree/v1.15) (2024-07-09)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.14...v1.15)
+
+**Logs:**
+- [LENS-221](https://ondsel-brad.atlassian.net/browse/LENS-221): Fixed color issue.
+- [LENS-222](https://ondsel-brad.atlassian.net/browse/LENS-222): Avoid showing plane and origin object from object list view.
 
 ## [v1.14](https://github.com/Ondsel-Development/FC-Worker/tree/v1.14) (2024-07-03)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.13...v1.14)
