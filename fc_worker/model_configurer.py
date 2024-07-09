@@ -118,24 +118,25 @@ def model_configurer_command(event, context):
 
 
 def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str, link_files: list):
+    exclude_objs = ["App::Plane", "App::Origin"]
     initial_attributes = {}
     try:
         logger.info(f"Link Files: {str(link_files)}")
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
+                zip_ref.extractall(tmp_dir)
 
-            xml_root_gui = ET.parse(f"{temp_dir}/GuiDocument.xml")
-            xml_root = ET.parse(f"{temp_dir}/Document.xml")
+            xml_root_gui = ET.parse(f"{tmp_dir}/GuiDocument.xml")
+            xml_root = ET.parse(f"{tmp_dir}/Document.xml")
 
             visible_objects_names = get_visible_objects(xml_root_gui)
             logger.debug(f"Visible objects: {visible_objects_names}")
             objs_without_brps = []
             for obj_name in visible_objects_names:
                 obj = doc.getObject(obj_name)
-                if hasattr(obj, "Shape") and is_obj_have_part_file(obj_name, xml_root) is False:
+                if hasattr(obj, "Shape") and set(obj.getAllDerivedFrom()).isdisjoint(set(exclude_objs)) and is_obj_have_part_file(obj_name, xml_root) is False:
                     objs_without_brps.append(obj)
 
             logger.debug(f"Objects without brep: {[i.Name for i in objs_without_brps]}")
@@ -151,30 +152,36 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                     update_model(attribute_obj, initial_attributes, attributes)
             doc.save()
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Create nested directories to handle ".." path in linked files
-            relative_nested_dir_path = "/".join([str(uuid.uuid4()) for _ in range(NUM_OF_PARENT_DIRECTORY_STEPS)])
-            temp_dir = f"{temp_dir}/{relative_nested_dir_path}"
-            os.makedirs(temp_dir)
-            with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
-            brep_folder = os.path.join(temp_dir, "breps")
-            os.mkdir(brep_folder)
-            for obj in objs_without_brps:
-                Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Create nested directories to handle ".." path in linked files
+                relative_nested_dir_path = "/".join([str(uuid.uuid4()) for _ in range(NUM_OF_PARENT_DIRECTORY_STEPS)])
+                temp_dir = f"{temp_dir}/{relative_nested_dir_path}"
+                os.makedirs(temp_dir)
+                with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
+                    zip_ref.extractall(temp_dir)
+                brep_folder = os.path.join(temp_dir, "breps")
+                os.mkdir(brep_folder)
+                for obj in objs_without_brps:
+                    Part.export([Part.show(obj.Shape)], os.path.join(brep_folder, f"ondsel_{obj.Name}.brp"))
 
-            for file in link_files:
-                file_path = file.split("/", 3 + NUM_OF_PARENT_DIRECTORY_STEPS)
-                relative_file_path = pathlib.Path(file_path[-1])
-                new_file_path = f"{temp_dir}/{relative_file_path.parent}"
-                if not os.path.exists(new_file_path):
-                    os.makedirs(new_file_path)
-                os.symlink(
-                    file,
-                    f"{temp_dir}/{relative_file_path}"
-                )
+                for file in link_files:
+                    file_path = file.split("/", 3 + NUM_OF_PARENT_DIRECTORY_STEPS)
+                    relative_file_path = pathlib.Path(file_path[-1])
+                    new_file_path = f"{temp_dir}/{relative_file_path.parent}"
+                    if not os.path.exists(new_file_path):
+                        os.makedirs(new_file_path)
+                    os.symlink(
+                        file,
+                        f"{temp_dir}/{relative_file_path}"
+                    )
 
-            createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
+                for file in os.listdir(tmp_dir):
+                    if file not in os.listdir(temp_dir):
+                        os.symlink(
+                            f"{tmp_dir}/{file}",
+                            f"{temp_dir}/{file}"
+                        )
+                createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 
