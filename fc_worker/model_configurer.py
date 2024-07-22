@@ -150,7 +150,12 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                 initial_attributes = get_property_data(attribute_obj)
                 if attributes:
                     update_model(attribute_obj, initial_attributes, attributes)
-            doc.save()
+            # FIXME: In AWS Lambda side, doc.save() throwing below error when object have PropertyFileIncluded.
+            #  fc_worker.model_configurer- 159: ERROR: {'sclassname': 'N4Base15FileSystemErrorE', 'sErrMsg': "PropertyFileIncluded::SaveDocFile(): File '/MainBoard-20251.wrl' in transient directory doesn't exist.", 'sfile': '', 'iline': 0, 'sfunction': '', 'swhat': "PropertyFileIncluded::SaveDocFile(): File '/MainBoard-20251.wrl' in transient directory doesn't exist.", 'btranslatable': False, 'breported': False}
+            try:
+                doc.save()
+            except Exception as ex:
+                logger.error(str(ex))
 
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Create nested directories to handle ".." path in linked files
