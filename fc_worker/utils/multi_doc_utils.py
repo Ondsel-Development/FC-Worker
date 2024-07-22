@@ -25,9 +25,9 @@ def find_path_link(link):
         if file_path:
             return file_path
         else:
-            raise UnsupportedException("Expecting a file path in property XLink")
+            return None
     else:
-        raise UnsupportedException("Expecting one file property in XLink")
+        return None
 
 
 def find_missing_links(doc):
