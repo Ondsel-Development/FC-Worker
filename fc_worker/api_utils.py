@@ -138,7 +138,10 @@ def trace_error_log(func: Callable) -> Callable:
             error_data = {
                 "code": 999,
                 "type": "INTERNAL_SERVER_ERROR",
-                "detail": {"error": ex.args},
+                "detail": {
+                    "error": ex.args,
+                    "strError": str(ex)
+                },
             }
         if error_data:
             res = requests.patch(
