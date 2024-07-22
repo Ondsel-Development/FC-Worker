@@ -11,6 +11,11 @@ import xml.sax
 import xml.sax.handler
 import xml.sax.xmlreader
 import zipfile
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 # SAX handler to parse the Document.xml
 class DocumentHandler(xml.sax.handler.ContentHandler):
@@ -64,7 +69,11 @@ def createDocument(filename, outpath):
     compress = zipfile.ZipFile(outpath, 'w', zipfile.ZIP_DEFLATED)
     for i in files:
         dirs = os.path.split(i)
-        compress.write(i, dirs[-1], zipfile.ZIP_DEFLATED)
+        try:
+            compress.write(i, dirs[-1], zipfile.ZIP_DEFLATED)
+        except Exception as ex:
+            logger.warning(str(ex))
+            continue
     compress.close()
 
 def getFilesList(filename):
