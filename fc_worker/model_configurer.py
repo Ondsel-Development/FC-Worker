@@ -124,6 +124,7 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
         logger.info(f"Link Files: {str(link_files)}")
         doc = FreeCAD.openDocument(str(freecad_file_path))
         FreeCAD.setActiveDocument(doc.Name)
+        logger.info(f"Recomputed: {str(doc.recompute())}")
         with tempfile.TemporaryDirectory() as tmp_dir:
             with zipfile.ZipFile(freecad_file_path, "r") as zip_ref:
                 zip_ref.extractall(tmp_dir)
@@ -150,7 +151,19 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                 initial_attributes = get_property_data(attribute_obj)
                 if attributes:
                     update_model(attribute_obj, initial_attributes, attributes)
-            doc.save()
+            try:
+                doc.save()
+                logger.info("Doc Save is working")
+            except Exception as ex:
+                logger.error("Doc Save is not working")
+                logger.error(str(ex))
+
+            try:
+                doc.saveAs("/tmp/test.FCStd")
+                logger.info("Doc SaveAs is working")
+            except Exception as ex:
+                logger.error("Doc SaveAs is not working")
+                logger.error(str(ex))
 
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Create nested directories to handle ".." path in linked files
