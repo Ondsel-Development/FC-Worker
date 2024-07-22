@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.15...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.16...main)
+
+## [v1.16](https://github.com/Ondsel-Development/FC-Worker/tree/v1.16) (2024-07-22)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.15...v1.16)
+
+**Logs:**
+- [LENS-248](https://ondsel-brad.atlassian.net/browse/LENS-248): Fixed bug in loading multidoc assembly files.
 
 ## [v1.15](https://github.com/Ondsel-Development/FC-Worker/tree/v1.15) (2024-07-09)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.14...v1.15)
