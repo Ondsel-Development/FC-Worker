@@ -7,6 +7,7 @@ from fc_worker.api_utils import (
     EXPORT_CMDS,
     trace_log,
 )
+from fc_worker.config import VERSION
 
 print(f"Group id of the current process: {os.getuid()}")
 print(f"Real user ID of the current process: {os.getgid()}")
@@ -14,7 +15,7 @@ print(f"Real user ID of the current process: {os.getgid()}")
 
 @trace_log
 def lambda_handler(event, context):
-    print(f"Executing lambda")
+    print(f"Executing lambda: {VERSION}")
     print(f"Event: {event}")
     print(f"Context: {context}")
     command = event.get("command", None)
