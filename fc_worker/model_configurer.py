@@ -90,13 +90,19 @@ def model_configurer_command(event, context):
         else:
             raise Exception("Give input file format not supported yet.")
 
+        logger.debug("Uploading generated model")
         res = requests.post(
             url=UPLOAD_ENDPOINT,
             headers=headers,
             files={"file": open(output_file, "rb")}
         )
         if not res.ok:
+            logger.debug("Request is not OK")
+            logger.debug(str(res.text))
             raise Exception("Failed to upload generated file")
+        else:
+            logger.debug("Request is OK")
+            logger.debug(str(res.text))
 
         data = {
             "isObjGenerationInProgress": False,
@@ -153,7 +159,9 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
             # FIXME: In AWS Lambda side, doc.save() throwing below error when object have PropertyFileIncluded.
             #  fc_worker.model_configurer- 159: ERROR: {'sclassname': 'N4Base15FileSystemErrorE', 'sErrMsg': "PropertyFileIncluded::SaveDocFile(): File '/MainBoard-20251.wrl' in transient directory doesn't exist.", 'sfile': '', 'iline': 0, 'sfunction': '', 'swhat': "PropertyFileIncluded::SaveDocFile(): File '/MainBoard-20251.wrl' in transient directory doesn't exist.", 'btranslatable': False, 'breported': False}
             try:
+                logger.debug("Before saving doc")
                 doc.save()
+                logger.debug("Doc successfully saved.")
             except Exception as ex:
                 logger.error(str(ex))
 
@@ -186,8 +194,11 @@ def model_configure(freecad_file_path: str, attributes: dict, obj_file_path: str
                             f"{tmp_dir}/{file}",
                             f"{temp_dir}/{file}"
                         )
+                logger.debug("Before generating fcstd file for viewer")
                 createDocument(os.path.join(temp_dir, "Document.xml"), str(obj_file_path))
+                logger.debug("File successfully generated for viewer")
     finally:
         FreeCAD.closeDocument(FreeCAD.ActiveDocument.Name)
 
+    logger.debug("model_configure function completed")
     return attributes if attributes else initial_attributes
