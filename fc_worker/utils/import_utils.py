@@ -12,6 +12,9 @@ def open_doc_in_freecad(input_file_path: str):
     elif suffix == ".OBJ":
         import Mesh
         Mesh.open(str(input_file_path))
+    elif suffix == ".STEP" or suffix == ".STP":
+        import Import
+        Import.open(str(input_file_path))
     else:
         raise ValueError(f"Given input file format ({input_file_path}) importer not implemented yet.")
 

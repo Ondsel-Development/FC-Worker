@@ -69,7 +69,8 @@ def export_command(event, command):
         with open(input_file, "wb") as f:
             f.write(file_data)
 
-        download_assemblies(_id, input_file, tmp_dir, headers)
+        if pathlib.Path(input_file).suffix.upper() == ".FCSTD":
+            download_assemblies(_id, input_file, tmp_dir, headers)
         export_model_cmd(input_file, attributes, output_file)
 
         logger.info("Starting pushing generated mesh to upload endpoint")
