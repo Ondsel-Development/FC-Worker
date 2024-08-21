@@ -1,7 +1,13 @@
 # Changelog
 
 ## [Unreleased](https://github.com/Ondsel-Development/FC-Worker/tree/main)
-[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.16...main)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.17...main)
+
+## [v1.17](https://github.com/Ondsel-Development/FC-Worker/tree/v1.17) (2024-08-21)
+[Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.16...v1.17)
+
+**Logs:**
+- [LENS-269](https://ondsel-brad.atlassian.net/browse/LENS-269): Handle exports from STEP file.
 
 ## [v1.16](https://github.com/Ondsel-Development/FC-Worker/tree/v1.16) (2024-07-22)
 [Full Changelog](https://github.com/Ondsel-Development/FC-Worker/compare/v1.15...v1.16)
