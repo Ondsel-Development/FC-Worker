@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Ondsel <development@ondsel.com>
+#
+# SPDX-License-Identifier: LGPL-2.0-or-later
+
 FROM amrit3701/freecad-cli:0.21-amd64-01.05.2024
 
 WORKDIR /

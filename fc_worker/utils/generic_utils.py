@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Ondsel <development@ondsel.com>
+#
+# SPDX-License-Identifier: LGPL-2.0-or-later
+
 import logging
 import xml.etree.ElementTree as ET
 from enum import Enum

@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2024 Ondsel <development@ondsel.com>
+#
+# SPDX-License-Identifier: LGPL-2.0-or-later
+
+version = 1
+
+# Third party files
+[[annotations]]
+path = "fc_worker/freecad_libs/importOBJ.py"
+SPDX-FileCopyrightText = "2011 Yorik van Havre <yorik@uncreated.net>"
+SPDX-License-Identifier = "LGPL-2.0-or-later"
+
+[[annotations]]
+path = "fc_worker/freecad_libs/PathGeom.py"
+SPDX-FileCopyrightText = [
+    "2016 sliptonic <shopinthewoods@gmail.com>",
+    "2021 Schildkroet"
+]
+SPDX-License-Identifier = "LGPL-2.0-or-later"
